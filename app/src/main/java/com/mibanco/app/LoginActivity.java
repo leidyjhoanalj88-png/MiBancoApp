@@ -1,60 +1,51 @@
-package com.app.bankui;
+package com.mibanco.app;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import org.json.JSONObject;
 
-public class LoginPinActivity extends Activity {
+public class LoginActivity extends Activity {
 
-    EditText txtPassword;
+    EditText txtUser, txtPass;
     Button btnEntrar;
-    String username = "";
-    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_pin);
+        setContentView(R.layout.activity_login);
 
-        session = new SessionManager(this);
-        username = getIntent().getStringExtra("username");
-        if (username == null) username = "";
-
-        txtPassword = findViewById(R.id.txtPassword);
+        txtUser  = findViewById(R.id.txtUser);
+        txtPass  = findViewById(R.id.txtPass);
         btnEntrar = findViewById(R.id.btnEntrar);
 
         btnEntrar.setOnClickListener(v -> {
-            String pass = txtPassword.getText().toString().trim();
-            if (pass.isEmpty()) {
-                Toast.makeText(this, "Ingresá tu contraseña", Toast.LENGTH_SHORT).show();
+            String user = txtUser.getText().toString().trim();
+            String pass = txtPass.getText().toString().trim();
+            if (user.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(this, "Completá todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
-            doLogin(pass);
+            doLogin(user, pass);
         });
     }
 
-    private void doLogin(String password) {
+    private void doLogin(String user, String pass) {
         new Thread(() -> {
             try {
-                JSONObject resp = ApiClient.login(username, password);
+                org.json.JSONObject resp = ApiClient.login(user, pass);
                 String token = resp.getString("token");
-                String user = resp.optString("username", username);
-                session.saveSession(user, token);
-
+                new SessionManager(this).saveSession(user, token);
                 runOnUiThread(() -> {
-                    Intent i = new Intent(LoginPinActivity.this, HomeActivity.class);
-                    startActivity(i);
+                    startActivity(new Intent(this, DashboardActivity.class));
                     finish();
                 });
             } catch (Exception e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "Contraseña incorrecta o error de red", Toast.LENGTH_SHORT).show();
-                });
+                runOnUiThread(() ->
+                    Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                );
             }
         }).start();
     }

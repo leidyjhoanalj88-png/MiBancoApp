@@ -23,8 +23,8 @@ public class ApiClient {
             json.put("password", pass);
 
             RequestBody body = RequestBody.create(
-                    json.toString(),
-                    MediaType.parse("application/json")
+                    MediaType.parse("application/json"),
+                    json.toString()
             );
 
             Request request = new Request.Builder()
@@ -57,8 +57,8 @@ public class ApiClient {
             json.put("password", pass);
 
             RequestBody body = RequestBody.create(
-                    json.toString(),
-                    MediaType.parse("application/json")
+                    MediaType.parse("application/json"),
+                    json.toString()
             );
 
             Request request = new Request.Builder()

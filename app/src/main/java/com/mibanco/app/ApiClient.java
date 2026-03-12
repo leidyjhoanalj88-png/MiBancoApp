@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://TU_IP:5000";
+    private static final String BASE_URL = "https://web-production-0e1d83.up.railway.app";
 
     public static JSONObject login(String username, String password) throws Exception {
         URL url = new URL(BASE_URL + "/login");

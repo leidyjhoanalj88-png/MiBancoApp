@@ -1,4 +1,4 @@
-package com.app.bankui;
+package com.mibanco.app;
 
 import org.json.JSONObject;
 import java.io.OutputStream;
@@ -18,18 +18,14 @@ public class ApiClient {
         conn.setDoOutput(true);
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
-
         JSONObject body = new JSONObject();
         body.put("username", username);
         body.put("password", password);
-
         OutputStream os = conn.getOutputStream();
         os.write(body.toString().getBytes("UTF-8"));
         os.close();
-
         int code = conn.getResponseCode();
         if (code != 200) throw new Exception("Login fallido. Código: " + code);
-
         Scanner sc = new Scanner(conn.getInputStream());
         StringBuilder sb = new StringBuilder();
         while (sc.hasNext()) sb.append(sc.nextLine());
@@ -44,30 +40,9 @@ public class ApiClient {
         conn.setRequestProperty("Authorization", "Bearer " + token);
         conn.setConnectTimeout(5000);
         conn.setReadTimeout(5000);
-
         int code = conn.getResponseCode();
-        if (code == 401) throw new Exception("Token inválido o expirado");
-        if (code != 200) throw new Exception("Error al obtener saldo. Código: " + code);
-
-        Scanner sc = new Scanner(conn.getInputStream());
-        StringBuilder sb = new StringBuilder();
-        while (sc.hasNext()) sb.append(sc.nextLine());
-        sc.close();
-        return new JSONObject(sb.toString());
-    }
-
-    public static JSONObject getMovimientos(String username, String token) throws Exception {
-        URL url = new URL(BASE_URL + "/movimientos/" + username);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", "Bearer " + token);
-        conn.setConnectTimeout(5000);
-        conn.setReadTimeout(5000);
-
-        int code = conn.getResponseCode();
-        if (code == 401) throw new Exception("Token inválido o expirado");
-        if (code != 200) throw new Exception("Error al obtener movimientos. Código: " + code);
-
+        if (code == 401) throw new Exception("Token inválido");
+        if (code != 200) throw new Exception("Error: " + code);
         Scanner sc = new Scanner(conn.getInputStream());
         StringBuilder sb = new StringBuilder();
         while (sc.hasNext()) sb.append(sc.nextLine());

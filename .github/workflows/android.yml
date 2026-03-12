@@ -16,8 +16,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Setup Gradle 7.5
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '7.5'
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug --warning-mode all
+        run: gradle assembleDebug

@@ -7,29 +7,55 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import org.json.JSONObject;
 
-public class LoginActivity extends Activity {
+public class LoginPinActivity extends Activity {
 
-    EditText txtUser;
-    Button btnContinuar;
+    EditText txtPassword;
+    Button btnEntrar;
+    String username = "";
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_pin);
 
-        txtUser = findViewById(R.id.txtUser);
-        btnContinuar = findViewById(R.id.btnContinuar);
+        session = new SessionManager(this);
+        username = getIntent().getStringExtra("username");
+        if (username == null) username = "";
 
-        btnContinuar.setOnClickListener(v -> {
-            String user = txtUser.getText().toString().trim();
-            if (user.isEmpty()) {
-                Toast.makeText(this, "Ingresá tu usuario", Toast.LENGTH_SHORT).show();
+        txtPassword = findViewById(R.id.txtPassword);
+        btnEntrar = findViewById(R.id.btnEntrar);
+
+        btnEntrar.setOnClickListener(v -> {
+            String pass = txtPassword.getText().toString().trim();
+            if (pass.isEmpty()) {
+                Toast.makeText(this, "Ingresá tu contraseña", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent i = new Intent(LoginActivity.this, LoginPinActivity.class);
-            i.putExtra("username", user);
-            startActivity(i);
+            doLogin(pass);
         });
+    }
+
+    private void doLogin(String password) {
+        new Thread(() -> {
+            try {
+                JSONObject resp = ApiClient.login(username, password);
+                String token = resp.getString("token");
+                String user = resp.optString("username", username);
+                session.saveSession(user, token);
+
+                runOnUiThread(() -> {
+                    Intent i = new Intent(LoginPinActivity.this, HomeActivity.class);
+                    startActivity(i);
+                    finish();
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Contraseña incorrecta o error de red", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
     }
 }

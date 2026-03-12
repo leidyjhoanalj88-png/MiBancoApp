@@ -14,6 +14,19 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         saldo = findViewById(R.id.saldo);
-        ApiClient.getSaldo("usuario", saldo);
+
+        SessionManager session = new SessionManager(this);
+        String username = session.getUsername();
+        String token = session.getToken();
+
+        new Thread(() -> {
+            try {
+                org.json.JSONObject resp = ApiClient.getSaldo(username, token);
+                String monto = resp.getString("saldo");
+                runOnUiThread(() -> saldo.setText("Saldo: $" + monto));
+            } catch (Exception e) {
+                runOnUiThread(() -> saldo.setText("Error al obtener saldo"));
+            }
+        }).start();
     }
 }

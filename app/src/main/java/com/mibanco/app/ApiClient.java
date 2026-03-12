@@ -1,104 +1,77 @@
-package com.mibanco.app;
+package com.app.bankui;
 
-import android.content.Context;
-import android.content.Intent;
-import android.widget.TextView;
-import okhttp3.*;
 import org.json.JSONObject;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
 
 public class ApiClient {
 
-    static String API = "https://tuservidor.com/api";
+    private static final String BASE_URL = "http://TU_IP:5000";
 
-    static OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .build();
+    public static JSONObject login(String username, String password) throws Exception {
+        URL url = new URL(BASE_URL + "/login");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
 
-    public static void login(String user, String pass, Context ctx) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("username", user);
-            json.put("password", pass);
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("password", password);
 
-            RequestBody body = RequestBody.create(
-                    MediaType.parse("application/json"),
-                    json.toString()
-            );
+        OutputStream os = conn.getOutputStream();
+        os.write(body.toString().getBytes("UTF-8"));
+        os.close();
 
-            Request request = new Request.Builder()
-                    .url(API + "/login")
-                    .post(body)
-                    .build();
+        int code = conn.getResponseCode();
+        if (code != 200) throw new Exception("Login fallido. Código: " + code);
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    e.printStackTrace();
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        ctx.startActivity(new Intent(ctx, DashboardActivity.class));
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Scanner sc = new Scanner(conn.getInputStream());
+        StringBuilder sb = new StringBuilder();
+        while (sc.hasNext()) sb.append(sc.nextLine());
+        sc.close();
+        return new JSONObject(sb.toString());
     }
 
-    public static void register(String user, String pass) {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("username", user);
-            json.put("password", pass);
+    public static JSONObject getSaldo(String username, String token) throws Exception {
+        URL url = new URL(BASE_URL + "/saldo/" + username);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + token);
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
 
-            RequestBody body = RequestBody.create(
-                    MediaType.parse("application/json"),
-                    json.toString()
-            );
+        int code = conn.getResponseCode();
+        if (code == 401) throw new Exception("Token inválido o expirado");
+        if (code != 200) throw new Exception("Error al obtener saldo. Código: " + code);
 
-            Request request = new Request.Builder()
-                    .url(API + "/register")
-                    .post(body)
-                    .build();
-
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    e.printStackTrace();
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Scanner sc = new Scanner(conn.getInputStream());
+        StringBuilder sb = new StringBuilder();
+        while (sc.hasNext()) sb.append(sc.nextLine());
+        sc.close();
+        return new JSONObject(sb.toString());
     }
 
-    public static void getSaldo(String user, TextView view) {
-        Request request = new Request.Builder()
-                .url(API + "/saldo/" + user)
-                .build();
+    public static JSONObject getMovimientos(String username, String token) throws Exception {
+        URL url = new URL(BASE_URL + "/movimientos/" + username);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + token);
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
+        int code = conn.getResponseCode();
+        if (code == 401) throw new Exception("Token inválido o expirado");
+        if (code != 200) throw new Exception("Error al obtener movimientos. Código: " + code);
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String data = response.body().string();
-                    view.post(() -> view.setText(data));
-                }
-            }
-        });
+        Scanner sc = new Scanner(conn.getInputStream());
+        StringBuilder sb = new StringBuilder();
+        while (sc.hasNext()) sb.append(sc.nextLine());
+        sc.close();
+        return new JSONObject(sb.toString());
     }
 }

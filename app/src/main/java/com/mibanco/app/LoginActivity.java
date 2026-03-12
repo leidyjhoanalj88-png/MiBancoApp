@@ -1,35 +1,35 @@
-package com.mibanco.app;
+package com.app.bankui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
-    EditText user, pass;
-    Button login;
+    EditText txtUser;
+    Button btnContinuar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        user = findViewById(R.id.user);
-        pass = findViewById(R.id.pass);
-        login = findViewById(R.id.login);
+        txtUser = findViewById(R.id.txtUser);
+        btnContinuar = findViewById(R.id.btnContinuar);
 
-        login.setOnClickListener(v -> {
-            String u = user.getText().toString().trim();
-            String p = pass.getText().toString().trim();
-
-            if (u.isEmpty() || p.isEmpty()) {
-                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
+        btnContinuar.setOnClickListener(v -> {
+            String user = txtUser.getText().toString().trim();
+            if (user.isEmpty()) {
+                Toast.makeText(this, "Ingresá tu usuario", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            ApiClient.login(u, p, this);
+            Intent i = new Intent(LoginActivity.this, LoginPinActivity.class);
+            i.putExtra("username", user);
+            startActivity(i);
         });
     }
 }

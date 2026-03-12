@@ -49,4 +49,27 @@ public class ApiClient {
         sc.close();
         return new JSONObject(sb.toString());
     }
+
+    public static JSONObject register(String username, String password) throws Exception {
+        URL url = new URL(BASE_URL + "/register");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("password", password);
+        OutputStream os = conn.getOutputStream();
+        os.write(body.toString().getBytes("UTF-8"));
+        os.close();
+        int code = conn.getResponseCode();
+        if (code != 200 && code != 201) throw new Exception("Error al registrar. Código: " + code);
+        Scanner sc = new Scanner(conn.getInputStream());
+        StringBuilder sb = new StringBuilder();
+        while (sc.hasNext()) sb.append(sc.nextLine());
+        sc.close();
+        return new JSONObject(sb.toString());
+    }
 }

@@ -1,15 +1,20 @@
 package com.mibanco.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this, LoginActivity.class));
+        SessionManager session = new SessionManager(this);
+        if (session.isLoggedIn()) {
+            startActivity(new Intent(this, DashboardActivity.class));
+        } else {
+            startActivity(new Intent(this, LoginActivity.class));
+        }
         finish();
     }
 }

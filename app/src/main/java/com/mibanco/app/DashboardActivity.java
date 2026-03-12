@@ -1,9 +1,7 @@
 package com.mibanco.app;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,7 +27,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        username = session.getUsername();
+        username = session.getUser();
         token = session.getToken();
 
         cargarSaldo();
@@ -37,35 +35,24 @@ public class DashboardActivity extends AppCompatActivity {
         btnActualizar.setOnClickListener(v -> cargarSaldo());
     }
 
-    private void cargarSaldo() {
-
-        saldo.setText("Cargando saldo...");
+    private void cargarSaldo(){
 
         new Thread(() -> {
 
             try {
 
                 JSONObject resp = ApiClient.getSaldo(username, token);
-
                 String monto = resp.getString("saldo");
 
                 runOnUiThread(() ->
-                        saldo.setText("Saldo disponible: $" + monto)
+                        saldo.setText("Saldo: $" + monto)
                 );
 
-            } catch (Exception e) {
+            } catch (Exception e){
 
-                runOnUiThread(() -> {
-
-                    saldo.setText("Error al obtener saldo");
-
-                    Toast.makeText(
-                            DashboardActivity.this,
-                            e.getMessage(),
-                            Toast.LENGTH_LONG
-                    ).show();
-
-                });
+                runOnUiThread(() ->
+                        saldo.setText("Error saldo")
+                );
             }
 
         }).start();

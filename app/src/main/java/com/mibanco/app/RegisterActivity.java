@@ -29,7 +29,18 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            ApiClient.register(u, p);
+            new Thread(() -> {
+                try {
+                    ApiClient.register(u, p);
+                    runOnUiThread(() ->
+                        Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                    );
+                } catch (Exception e) {
+                    runOnUiThread(() ->
+                        Toast.makeText(this, "Error al registrar: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }).start();
         });
     }
 }

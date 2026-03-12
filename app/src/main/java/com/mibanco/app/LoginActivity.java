@@ -1,52 +1,91 @@
 package com.mibanco.app;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONObject;
+
+public class LoginActivity extends AppCompatActivity {
 
     EditText txtUser, txtPass;
     Button btnEntrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        txtUser  = findViewById(R.id.txtUser);
-        txtPass  = findViewById(R.id.txtPass);
+        txtUser = findViewById(R.id.txtUser);
+        txtPass = findViewById(R.id.txtPass);
         btnEntrar = findViewById(R.id.btnEntrar);
 
         btnEntrar.setOnClickListener(v -> {
+
             String user = txtUser.getText().toString().trim();
             String pass = txtPass.getText().toString().trim();
+
             if (user.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Completá todos los campos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            btnEntrar.setEnabled(false);
+            btnEntrar.setText("Ingresando...");
+
             doLogin(user, pass);
         });
     }
 
     private void doLogin(String user, String pass) {
+
         new Thread(() -> {
+
             try {
-                org.json.JSONObject resp = ApiClient.login(user, pass);
+
+                JSONObject resp = ApiClient.login(user, pass);
+
                 String token = resp.getString("token");
-                new SessionManager(this).saveSession(user, token);
+
+                SessionManager session = new SessionManager(LoginActivity.this);
+                session.saveSession(user, token);
+
                 runOnUiThread(() -> {
-                    startActivity(new Intent(this, DashboardActivity.class));
+
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Login exitoso",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
+                    startActivity(i);
                     finish();
+
                 });
+
             } catch (Exception e) {
-                runOnUiThread(() ->
-                    Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                );
+
+                runOnUiThread(() -> {
+
+                    btnEntrar.setEnabled(true);
+                    btnEntrar.setText("Entrar");
+
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Usuario o contraseña incorrectos",
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                });
+
             }
+
         }).start();
     }
 }

@@ -4,13 +4,26 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="32dp">
+    android:padding="32dp"
+    android:background="#F5F6FA">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi Banco"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#1E88E5"
+        android:layout_marginBottom="40dp"/>
 
     <EditText
         android:id="@+id/txtUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Usuario"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:backgroundTint="#1E88E5"
         android:layout_marginBottom="16dp"/>
 
     <EditText
@@ -19,12 +32,18 @@
         android:layout_height="wrap_content"
         android:hint="Contraseña"
         android:inputType="textPassword"
+        android:padding="12dp"
+        android:backgroundTint="#1E88E5"
         android:layout_marginBottom="24dp"/>
 
     <Button
         android:id="@+id/btnEntrar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ENTRAR"/>
+        android:text="ENTRAR"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1E88E5"
+        android:padding="12dp"/>
 
 </LinearLayout>

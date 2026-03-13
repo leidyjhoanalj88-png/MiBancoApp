@@ -2,26 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mibanco.app">
 
+    <!-- Permiso para conexión a internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="false"
         android:label="Mi Banco"
+        android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <activity
-            android:name=".DashboardActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false"/>
-
+        <!-- Pantalla principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -32,6 +23,21 @@
             </intent-filter>
 
         </activity>
+
+        <!-- Login -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"/>
+
+        <!-- Registro -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"/>
+
+        <!-- Dashboard -->
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="false"/>
 
     </application>
 
